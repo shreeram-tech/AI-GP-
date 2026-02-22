@@ -1,0 +1,105 @@
+<?xml version="1.0" ?>
+<!-- Quadrotor drone model for racing simulation -->
+<robot name="quadrotor" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Constants -->
+  <xacro:property name="mass" value="1.2"/>
+  <xacro:property name="arm_length" value="0.23"/>
+  <xacro:property name="motor_mass" value="0.05"/>
+  <xacro:property name="prop_mass" value="0.01"/>
+  <xacro:property name="body_dim" value="0.15"/>
+  
+  <!-- Inertia macro -->
+  <xacro:macro name="inertia_matrix" params="mass:=1.0 ixx:=1.0 iyy:=1.0 izz:=1.0">
+    <inertial>
+      <mass value="${mass}"/>
+      <inertia ixx="${ixx}" ixy="0.0" ixz="0.0" iyy="${iyy}" iyz="0.0" izz="${izz}"/>
+    </inertial>
+  </xacro:macro>
+
+  <!-- Main body link -->
+  <link name="base_link">
+    <xacro:inertia_matrix mass="${mass}" ixx="0.015" iyy="0.015" izz="0.02"/>
+    
+    <collision>
+      <geometry>
+        <box>
+          <size>${body_dim} ${body_dim} 0.08</size>
+        </box>
+      </geometry>
+    </collision>
+    
+    <visual>
+      <geometry>
+        <box>
+          <size>${body_dim} ${body_dim} 0.08</size>
+        </box>
+      </geometry>
+      <material name="black">
+        <color rgba="0.1 0.1 0.1 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- Motor frames (arms) - 4 of them -->
+  <xacro:macro name="motor_arm" params="motor_name x_pos y_pos z_pos">
+    <link name="${motor_name}_frame">
+      <xacro:inertia_matrix mass="${motor_mass}" ixx="0.0001" iyy="0.0001" izz="0.0001"/>
+      <visual>
+        <geometry>
+          <cylinder radius="0.01" length="${arm_length}"/>
+        </geometry>
+        <origin xyz="${x_pos/2} ${y_pos/2} 0" rpy="1.5708 0 0"/>
+        <material name="gray">
+          <color rgba="0.5 0.5 0.5 1.0"/>
+        </material>
+      </visual>
+    </link>
+    
+    <joint name="${motor_name}_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="${motor_name}_frame"/>
+      <origin xyz="${x_pos} ${y_pos} ${z_pos}" rpy="0 0 0"/>
+    </joint>
+    
+    <!-- Propeller (visual) -->
+    <link name="${motor_name}_prop">
+      <xacro:inertia_matrix mass="${prop_mass}" ixx="0.00005" iyy="0.0001" izz="0.00005"/>
+      <visual>
+        <geometry>
+          <box>
+            <size>0.11 0.01 0.001</size>
+          </box>
+        </geometry>
+        <material name="blue">
+          <color rgba="0.1 0.3 0.8 0.7"/>
+        </material>
+      </visual>
+    </link>
+    
+    <joint name="${motor_name}_prop_joint" type="continuous">
+      <parent link="${motor_name}_frame"/>
+      <child link="${motor_name}_prop"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- Create 4 motors -->
+  <xacro:motor_arm motor_name="motor_fl" x_pos="${arm_length}" y_pos="${arm_length}" z_pos="0.05"/>
+  <xacro:motor_arm motor_name="motor_fr" x_pos="${arm_length}" y_pos="-${arm_length}" z_pos="0.05"/>
+  <xacro:motor_arm motor_name="motor_bl" x_pos="-${arm_length}" y_pos="${arm_length}" z_pos="0.05"/>
+  <xacro:motor_arm motor_name="motor_br" x_pos="-${arm_length}" y_pos="-${arm_length}" z_pos="0.05"/>
+
+  <!-- Sensor frames (for state publishing) -->
+  <link name="imu_link">
+    <xacro:inertia_matrix mass="0.01" ixx="0.00001" iyy="0.00001" izz="0.00001"/>
+  </link>
+  
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+</robot>

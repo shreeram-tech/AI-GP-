@@ -1,0 +1,86 @@
+<?xml version="1.0" ?>
+<sdf version="1.10">
+  <model name="race_gate">
+    <!-- Racing gate: cubic frame with ring inside (visual only) -->
+    <!-- Dimensions: 5m x 5m opening, 0.2m frame width -->
+    <static>true</static>
+    
+    <!-- Main frame geometry -->
+    <link name="gate_frame">
+      <inertial>
+        <mass>10.0</mass>
+        <inertia>
+          <ixx>1.0</ixx>
+          <ixy>0.0</ixy>
+          <ixz>0.0</ixz>
+          <iyy>1.0</iyy>
+          <iyz>0.0</iyz>
+          <izz>1.0</izz>
+        </inertia>
+      </inertial>
+      
+      <!-- Collision: simple cylinder with radius 2.6m (interior), height 5.2m -->
+      <!-- This creates the "gate opening" detection volume -->
+      <collision name="gate_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>2.6</radius>
+            <length>5.2</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      
+      <!-- Visual: frame cube (4 corner posts + top/bottom beams) -->
+      <visual name="frame_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>5.4 5.4 5.4</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>1.0 0.0 0.0 1.0</ambient>
+          <diffuse>1.0 0.1 0.1 1.0</diffuse>
+          <specular>0.5 0.5 0.5 1.0</specular>
+          <emissive>0.2 0.0 0.0 1.0</emissive>
+        </material>
+      </visual>
+      
+      <!-- Inner ring (visual indicator) -->
+      <visual name="inner_ring">
+        <pose>0 0 0 1.5708 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>2.5</radius>
+            <length>0.1</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.2 0.8 0.2 0.8</ambient>
+          <diffuse>0.3 1.0 0.3 0.8</diffuse>
+          <specular>0.5 0.5 0.5 1.0</specular>
+        </material>
+      </visual>
+    </link>
+    
+    <!-- Detection link (for measuring gate passages) -->
+    <link name="gate_sensor">
+      <collision name="sensor_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>2.6</radius>
+            <length>5.2</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+    
+    <!-- Fixedjoint between frame and sensor -->
+    <joint name="frame_to_sensor" type="fixed">
+      <parent>gate_frame</parent>
+      <child>gate_sensor</child>
+    </joint>
+  </model>
+</sdf>

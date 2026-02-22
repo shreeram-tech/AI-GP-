@@ -1,0 +1,102 @@
+<?xml version="1.0" ?>
+<!-- Gazebo world for drone racing simulation -->
+<sdf version="1.10">
+  <world name="drone_racing_track">
+    
+    <!-- Physics: Realistic settings for quadrotor -->
+    <plugin name="ignition::gazebo::physics::Physics" filename="ignition-gazebo-physics-plugin">
+      <dart>
+        <contact_surface_layer>0.001</contact_surface_layer>
+      </dart>
+    </plugin>
+
+    <!-- Sensors -->
+    <plugin name="ignition::gazebo::systems::Sensors" filename="ignition-gazebo-sensors-system"/>
+
+    <!-- User commands (required for simulation) -->
+    <plugin name="ignition::gazebo::systems::UserCommands" filename="ignition-gazebo-user-commands-system"/>
+
+    <!-- Scene renderer -->
+    <plugin name="ignition::gazebo::systems::SceneManager" filename="ignition-gazebo-scene-manager-system"/>
+
+    <!-- IMU Public -->
+    <plugin name="ignition::gazebo::systems::ImuPublisher" filename="ignition-gazebo-imu-system"/>
+
+    <!-- Odometry Publisher -->
+    <plugin name="ignition::gazebo::systems::OdometryPublisher" filename="ignition-gazebo-odometry-publisher-system">
+      <odom_publish_frequency>50</odom_publish_frequency>
+    </plugin>
+
+    <!-- Contact forces -->
+    <plugin name="ignition::gazebo::systems::Contact" filename="ignition-gazebo-contact-system"/>
+
+    <!-- Environment lighting -->
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>100 100 100 0 0 0</pose>
+      <diffuse>1.0 1.0 1.0 1.0</diffuse>
+      <specular>0.2 0.2 0.2 1.0</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-1 -1 -1</direction>
+    </light>
+
+    <!-- Ground plane -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>500 500</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.0</mu>
+                <mu2>1.0</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>500 500</size>
+            </plane>
+          </geometry>
+          <material name="green">
+            <ambient>0.2 0.5 0.2 1.0</ambient>
+            <diffuse>0.3 0.7 0.3 1.0</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Sky -->
+    <atmosphere type="adiabatic"/>
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>0 0 0</magnetic_field>
+
+    <!-- Ambient light -->
+    <ambient>0.8 0.8 0.8 1.0</ambient>
+
+    <!-- Default camera view (optional, RViz will override) -->
+    <gui fullscreen="0">
+      <camera>
+        <pose>-30 -30 30 0 0.785 0</pose>
+      </camera>
+    </gui>
+
+    <!-- NOTE: Gates will be spawned programmatically by the gate spawner node -->
+    <!-- This world file provides physics and environment setup only -->
+
+  </world>
+</sdf>
