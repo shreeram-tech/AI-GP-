@@ -1,0 +1,4 @@
+need to add a proper madel of the drone (its just a dot as of now )
+need to fix the path following logic (its flying randomly(as of now it can only find the first gate then bad))
+need to work on the vision and path planning 
+gate identifiaction ""techniques""
